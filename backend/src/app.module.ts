@@ -1,33 +1,35 @@
 import { Module } from '@nestjs/common';
-import { CategoriasController } from './controllers/categorias.controller';
-import { CursosController } from './controllers/cursos.controller';
-import { ModulosController } from './controllers/modulos.controller';
-import { AulasController } from './controllers/aulas.controller';
-import { UsuariosController } from './controllers/usuarios.controller';
-import { MatriculasController } from './controllers/matriculas.controller';
-import { ProgressoController } from './controllers/progresso.controller';
-import { AvaliacoesController } from './controllers/avaliacoes.controller';
-import { TrilhasController } from './controllers/trilhas.controller';
-import { CertificadosController } from './controllers/certificados.controller';
-import { PlanosController } from './controllers/planos.controller';
-import { AssinaturasController } from './controllers/assinaturas.controller';
-import { PagamentosController } from './controllers/pagamentos.controller';
+import { PrismaModule } from './prisma/prisma.module';
+import { UsuariosModule } from './usuarios/usuarios.module';
+import { CategoriasModule } from './categorias/categorias.module';
+import { CursosModule } from './cursos/cursos.module';
+import { ModulosModule } from './modulos/modulos.module';
+import { AulasModule } from './aulas/aulas.module';
+import { MatriculasModule } from './matriculas/matriculas.module';
+import { ProgressoModule } from './progresso/progresso.module';
+import { AvaliacoesModule } from './avaliacoes/avaliacoes.module';
+import { TrilhasModule } from './trilhas/trilhas.module';
+import { CertificadosModule } from './certificados/certificados.module';
+import { PlanosModule } from './planos/planos.module';
+import { AssinaturasModule } from './assinaturas/assinaturas.module';
+import { PagamentosModule } from './pagamentos/pagamentos.module';
 
 @Module({
-  controllers: [
-    CategoriasController,
-    CursosController,
-    ModulosController,
-    AulasController,
-    UsuariosController,
-    MatriculasController,
-    ProgressoController,
-    AvaliacoesController,
-    TrilhasController,
-    CertificadosController,
-    PlanosController,
-    AssinaturasController,
-    PagamentosController,
+  imports: [
+    PrismaModule,
+    UsuariosModule,
+    CategoriasModule,
+    CursosModule,
+    ModulosModule,
+    AulasModule,
+    MatriculasModule,
+    ProgressoModule,
+    AvaliacoesModule,
+    TrilhasModule,
+    CertificadosModule,
+    PlanosModule,
+    AssinaturasModule,
+    PagamentosModule,
   ],
 })
 export class AppModule {}

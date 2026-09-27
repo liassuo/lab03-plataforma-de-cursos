@@ -1,0 +1,194 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ===== Core =====
+
+model Usuario {
+  id           Int      @id @default(autoincrement())
+  nomeCompleto String
+  email        String   @unique
+  senhaHash    String
+  dataCadastro DateTime @default(now())
+
+  cursosMinistrados Curso[]
+  matriculas        Matricula[]
+  progressoAulas    ProgressoAula[]
+  avaliacoes        Avaliacao[]
+  certificados      Certificado[]
+  assinaturas       Assinatura[]
+}
+
+model Categoria {
+  id        Int     @id @default(autoincrement())
+  nome      String  @unique
+  descricao String?
+
+  cursos  Curso[]
+  trilhas Trilha[]
+}
+
+model Curso {
+  id             Int      @id @default(autoincrement())
+  titulo         String
+  descricao      String?
+  idInstrutor    Int
+  idCategoria    Int
+  nivel          String // Iniciante, Intermediário, Avançado
+  dataPublicacao DateTime @default(now())
+  totalAulas     Int      @default(0)
+  totalHoras     Float    @default(0)
+
+  instrutor Usuario   @relation(fields: [idInstrutor], references: [id])
+  categoria Categoria @relation(fields: [idCategoria], references: [id])
+
+  modulos      Modulo[]
+  matriculas   Matricula[]
+  avaliacoes   Avaliacao[]
+  trilhas      TrilhaCurso[]
+  certificados Certificado[]
+}
+
+// ===== Conteúdo =====
+
+model Modulo {
+  id      Int    @id @default(autoincrement())
+  idCurso Int
+  titulo  String
+  ordem   Int
+
+  curso Curso  @relation(fields: [idCurso], references: [id], onDelete: Cascade)
+  aulas Aula[]
+}
+
+model Aula {
+  id             Int     @id @default(autoincrement())
+  idModulo       Int
+  titulo         String
+  tipoConteudo   String // Video, Texto, Quiz
+  urlConteudo    String?
+  duracaoMinutos Int
+  ordem          Int
+
+  modulo         Modulo          @relation(fields: [idModulo], references: [id], onDelete: Cascade)
+  progressoAulas ProgressoAula[]
+}
+
+// ===== Interação =====
+
+model Matricula {
+  id            Int       @id @default(autoincrement())
+  idUsuario     Int
+  idCurso       Int
+  dataMatricula DateTime  @default(now())
+  dataConclusao DateTime?
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id])
+  curso   Curso   @relation(fields: [idCurso], references: [id], onDelete: Cascade)
+
+  @@unique([idUsuario, idCurso])
+}
+
+model ProgressoAula {
+  idUsuario     Int
+  idAula        Int
+  dataConclusao DateTime?
+  status        String    @default("Pendente") // Pendente, Concluido
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id])
+  aula    Aula    @relation(fields: [idAula], references: [id], onDelete: Cascade)
+
+  @@id([idUsuario, idAula])
+}
+
+model Avaliacao {
+  id            Int      @id @default(autoincrement())
+  idUsuario     Int
+  idCurso       Int
+  nota          Int // 1 a 5
+  comentario    String?
+  dataAvaliacao DateTime @default(now())
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id])
+  curso   Curso   @relation(fields: [idCurso], references: [id], onDelete: Cascade)
+
+  @@unique([idUsuario, idCurso])
+}
+
+// ===== Curadoria =====
+
+model Trilha {
+  id          Int     @id @default(autoincrement())
+  titulo      String
+  descricao   String?
+  idCategoria Int
+
+  categoria    Categoria     @relation(fields: [idCategoria], references: [id])
+  cursos       TrilhaCurso[]
+  certificados Certificado[]
+}
+
+model TrilhaCurso {
+  idTrilha Int
+  idCurso  Int
+  ordem    Int
+
+  trilha Trilha @relation(fields: [idTrilha], references: [id], onDelete: Cascade)
+  curso  Curso  @relation(fields: [idCurso], references: [id], onDelete: Cascade)
+
+  @@id([idTrilha, idCurso])
+}
+
+model Certificado {
+  id                Int      @id @default(autoincrement())
+  idUsuario         Int
+  idCurso           Int
+  idTrilha          Int?
+  codigoVerificacao String   @unique
+  dataEmissao       DateTime @default(now())
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id])
+  curso   Curso   @relation(fields: [idCurso], references: [id], onDelete: Cascade)
+  trilha  Trilha? @relation(fields: [idTrilha], references: [id])
+}
+
+// ===== Negócio =====
+
+model Plano {
+  id           Int     @id @default(autoincrement())
+  nome         String
+  descricao    String?
+  preco        Float
+  duracaoMeses Int
+
+  assinaturas Assinatura[]
+}
+
+model Assinatura {
+  id         Int      @id @default(autoincrement())
+  idUsuario  Int
+  idPlano    Int
+  dataInicio DateTime @default(now())
+  dataFim    DateTime
+  status     String   @default("Ativa")
+
+  usuario    Usuario     @relation(fields: [idUsuario], references: [id])
+  plano      Plano       @relation(fields: [idPlano], references: [id])
+  pagamentos Pagamento[]
+}
+
+model Pagamento {
+  id                 Int      @id @default(autoincrement())
+  idAssinatura       Int
+  valorPago          Float
+  dataPagamento      DateTime @default(now())
+  metodoPagamento    String // Cartão, Pix, Boleto
+  idTransacaoGateway String
+
+  assinatura Assinatura @relation(fields: [idAssinatura], references: [id], onDelete: Cascade)
+}
