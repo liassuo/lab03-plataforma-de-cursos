@@ -39,7 +39,7 @@ O seed cria três usuários de teste (senha `123456` para todos):
 
 | Email             | Senha  |
 | ----------------- | ------ |
-| carlos@email.com  | 123456 |
+| teste@email.com   | 123456 |
 | ana@email.com     | 123456 |
 | marcos@email.com  | 123456 |
 

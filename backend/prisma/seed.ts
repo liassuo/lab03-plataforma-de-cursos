@@ -23,7 +23,7 @@ async function main() {
 
   await prisma.usuario.createMany({
     data: [
-      { nomeCompleto: 'Carlos Silva', email: 'carlos@email.com', senhaHash },
+      { nomeCompleto: 'Usuário Teste', email: 'teste@email.com', senhaHash },
       { nomeCompleto: 'Ana Souza', email: 'ana@email.com', senhaHash },
       { nomeCompleto: 'Prof. Marcos Lima', email: 'marcos@email.com', senhaHash },
     ],
