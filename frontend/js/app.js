@@ -115,7 +115,8 @@ async function atualizarPainel() {
 
 function formatarData(dataStr) {
   if (!dataStr) return '-';
-  const partes = dataStr.split('-');
+  // O backend devolve datas no formato ISO (2025-01-15T00:00:00.000Z)
+  const partes = String(dataStr).split('T')[0].split('-');
   if (partes.length === 3) {
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
   }
@@ -183,6 +184,11 @@ document.addEventListener('DOMContentLoaded', () => {
     filtroCategoria.addEventListener('change', carregarCursos);
   }
 
-  // Carregar painel inicial
-  atualizarPainel();
+  // Exige login antes de usar a plataforma
+  atualizarNavbarAuth();
+  if (estaLogado()) {
+    atualizarPainel();
+  } else {
+    abrirModalLogin();
+  }
 });
