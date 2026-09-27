@@ -15,6 +15,9 @@ body {
   background-color: var(--cor-fundo);
   color: var(--cor-texto);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -37,22 +40,17 @@ body {
   padding: 0.5rem 0.8rem !important;
 }
 
+.navbar .nav-link.active {
+  font-weight: 700;
+}
+
 .navbar .dropdown-item {
   font-size: 0.9rem;
 }
 
-.container-fluid.conteudo-principal {
+.conteudo-principal {
   flex: 1;
-}
-
-/* Seções */
-.secao-pagina {
-  display: none;
   animation: fadeIn 0.3s ease-in;
-}
-
-.secao-pagina.ativa {
-  display: block;
 }
 
 @keyframes fadeIn {
@@ -157,13 +155,6 @@ body {
   font-size: 0.9rem;
 }
 
-/* Badges */
-.badge-nivel {
-  font-size: 0.75rem;
-  padding: 4px 10px;
-  font-weight: 500;
-}
-
 /* Progresso */
 .progresso-barra {
   height: 10px;
@@ -197,7 +188,6 @@ body {
 /* Planos */
 .plano-card {
   transition: transform 0.2s;
-  cursor: pointer;
   border: 2px solid var(--cor-borda);
 }
 
@@ -216,12 +206,6 @@ body {
   font-size: 0.85rem;
   color: var(--cor-texto-claro);
   font-weight: 400;
-}
-
-/* Navegação ativa */
-.nav-link.ativo-secao {
-  font-weight: 700;
-  position: relative;
 }
 
 /* Estrelas de avaliação */
