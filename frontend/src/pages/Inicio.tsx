@@ -2,15 +2,20 @@ import { useEffect, useState } from 'react'
 import { api } from '../services/api'
 import { StatCard } from '../components/StatCard'
 import { corDoNivel } from '../utils'
+import { obterUsuarioLogado } from '../services/auth'
 import type { Certificado, Curso, Matricula, Usuario } from '../models'
 
 export function Inicio() {
+  const usuario = obterUsuarioLogado()
+  const admin = usuario?.tipo === 'ADMIN'
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [cursos, setCursos] = useState<Curso[]>([])
   const [matriculas, setMatriculas] = useState<Matricula[]>([])
   const [certificados, setCertificados] = useState<Certificado[]>([])
 
   useEffect(() => {
+    // O painel geral usa rotas que só o ADMIN pode acessar
+    if (!admin) return
     Promise.all([
       api.get<Usuario[]>('usuarios'),
       api.get<Curso[]>('cursos'),
@@ -25,6 +30,19 @@ export function Inicio() {
       })
       .catch((erro) => console.error('Erro ao carregar painel:', erro))
   }, [])
+
+  if (!admin) {
+    return (
+      <section>
+        <h2 className="titulo-secao">Olá, {usuario?.nomeCompleto}!</h2>
+        <p className="text-muted">
+          {usuario?.tipo === 'AUTOR'
+            ? 'Use o menu Acadêmico para cadastrar seus cursos, módulos e aulas.'
+            : 'Veja os cursos no Catálogo e acompanhe suas aulas em Meus Cursos.'}
+        </p>
+      </section>
+    )
+  }
 
   const cursosRecentes = cursos.slice(-5).reverse()
   const usuariosRecentes = usuarios.slice(-5).reverse()

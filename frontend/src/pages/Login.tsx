@@ -37,6 +37,7 @@ export function Login() {
                 <label className="form-label">Email</label>
                 <input
                   type="email"
+                  autoComplete="username"
                   className="form-control"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -47,6 +48,7 @@ export function Login() {
                 <label className="form-label">Senha</label>
                 <input
                   type="password"
+                  autoComplete="current-password"
                   className="form-control"
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
@@ -57,10 +59,6 @@ export function Login() {
                 <i className="bi bi-box-arrow-in-right me-1"></i>Entrar
               </button>
             </form>
-
-            <small className="text-muted d-block mt-3 text-center">
-              Usuário de teste: teste@email.com / 123456
-            </small>
           </div>
         </div>
       </div>

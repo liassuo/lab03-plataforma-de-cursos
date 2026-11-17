@@ -37,6 +37,16 @@ export function Usuarios() {
     }
   }
 
+  async function alterarTipo(id: number, tipo: string) {
+    try {
+      await api.put(`usuarios/${id}`, { tipo })
+      carregar()
+      exibirToast('Perfil alterado')
+    } catch (erro) {
+      exibirToast((erro as Error).message, 'danger')
+    }
+  }
+
   async function remover(id: number) {
     if (!confirm('Deseja remover este usuário?')) return
     try {
@@ -65,19 +75,27 @@ export function Usuarios() {
                 <th>ID</th>
                 <th>Nome Completo</th>
                 <th>Email</th>
+                <th>Perfil</th>
                 <th>Data Cadastro</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody>
               {usuarios.length === 0 && (
-                <tr><td colSpan={5} className="text-center text-muted">Nenhum usuário cadastrado</td></tr>
+                <tr><td colSpan={6} className="text-center text-muted">Nenhum usuário cadastrado</td></tr>
               )}
               {usuarios.map((u) => (
                 <tr key={u.id}>
                   <td>{u.id}</td>
                   <td>{u.nomeCompleto}</td>
                   <td>{u.email}</td>
+                  <td>
+                    <select className="form-select form-select-sm w-auto" value={u.tipo} onChange={(e) => alterarTipo(u.id, e.target.value)}>
+                      <option value="ALUNO">Aluno</option>
+                      <option value="AUTOR">Autor</option>
+                      <option value="ADMIN">Admin</option>
+                    </select>
+                  </td>
                   <td>{formatarData(u.dataCadastro)}</td>
                   <td>
                     <button className="btn btn-sm btn-outline-danger" onClick={() => remover(u.id)}>

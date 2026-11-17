@@ -104,7 +104,7 @@ export function Progresso() {
                 <div className="progress-bar bg-success" style={{ width: `${resumo.percentual}%` }}></div>
               </div>
               <small className="text-muted">
-                {resumo.concluidas} de {resumo.totalAulas} aula(s) concluída(s) — {resumo.percentual}%
+                {resumo.concluidas} de {resumo.totalAulas} aula(s) concluída(s) ({resumo.percentual}%)
               </small>
             </div>
           </div>

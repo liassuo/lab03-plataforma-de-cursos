@@ -4,6 +4,7 @@ export interface Usuario {
   id: number
   nomeCompleto: string
   email: string
+  tipo?: 'ALUNO' | 'AUTOR' | 'ADMIN'
   dataCadastro?: string
 }
 
@@ -20,7 +21,9 @@ export interface Curso {
   idInstrutor: number
   idCategoria: number
   nivel: string
+  preco: number
   dataPublicacao: string
+  dataAtualizacao?: string
   totalAulas: number
   totalHoras: number
   categoria?: Categoria
@@ -130,10 +133,27 @@ export interface Assinatura {
 
 export interface Pagamento {
   id: number
-  idAssinatura: number
+  idAssinatura: number | null
+  idMatricula: number | null
   valorPago: number
   dataPagamento: string
   metodoPagamento: string
   idTransacaoGateway: string
   assinatura?: Assinatura
+  matricula?: { curso?: Curso }
+}
+
+export interface Notificacao {
+  id: number
+  mensagem: string
+  lida: boolean
+  dataCriacao: string
+}
+
+// Progresso do usuário logado em um curso (GET progresso/meu/:idCurso)
+export interface MeuProgresso {
+  totalAulas: number
+  concluidas: number
+  percentual: number
+  aulasConcluidas: number[]
 }

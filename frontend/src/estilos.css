@@ -1,14 +1,123 @@
 :root {
-  --cor-primaria: #4a6cf7;
-  --cor-primaria-escura: #3a56d4;
-  --cor-fundo: #f4f6fc;
+  /* Tons quentes, iguais aos do app */
+  --cor-primaria: #b5562f;
+  --cor-primaria-escura: #94431f;
+  --cor-fundo: #faf6f2;
   --cor-card: #ffffff;
-  --cor-texto: #2d3436;
-  --cor-texto-claro: #636e72;
-  --cor-borda: #e0e5ec;
-  --cor-sucesso: #00b894;
-  --cor-perigo: #e17055;
-  --cor-aviso: #fdcb6e;
+  --cor-texto: #3b2f2a;
+  --cor-texto-claro: #7a6a60;
+  --cor-borda: #ecdfd5;
+  --cor-sucesso: #3f8f5b;
+  --cor-perigo: #c0392b;
+  --cor-aviso: #e0a83e;
+
+  /* Troca as cores padrão do Bootstrap (o azul dele) pelas da plataforma */
+  --bs-primary: #b5562f;
+  --bs-primary-rgb: 181, 86, 47;
+  --bs-success: #3f8f5b;
+  --bs-success-rgb: 63, 143, 91;
+  --bs-warning: #e0a83e;
+  --bs-warning-rgb: 224, 168, 62;
+  --bs-danger: #c0392b;
+  --bs-danger-rgb: 192, 57, 43;
+  --bs-info: #c7745a;
+  --bs-info-rgb: 199, 116, 90;
+  --bs-body-color: #3b2f2a;
+  --bs-body-color-rgb: 59, 47, 42;
+  --bs-secondary-color: #7a6a60;
+  --bs-link-color: #b5562f;
+  --bs-link-color-rgb: 181, 86, 47;
+  --bs-link-hover-color: #94431f;
+  --bs-link-hover-color-rgb: 148, 67, 31;
+  --bs-border-color: #ecdfd5;
+  --bs-focus-ring-color: rgba(181, 86, 47, 0.25);
+}
+
+/* Botões do Bootstrap */
+.btn-primary {
+  --bs-btn-bg: #b5562f;
+  --bs-btn-border-color: #b5562f;
+  --bs-btn-hover-bg: #9c4826;
+  --bs-btn-hover-border-color: #9c4826;
+  --bs-btn-active-bg: #8a3f21;
+  --bs-btn-active-border-color: #8a3f21;
+  --bs-btn-disabled-bg: #b5562f;
+  --bs-btn-disabled-border-color: #b5562f;
+  --bs-btn-focus-shadow-rgb: 181, 86, 47;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #b5562f;
+  --bs-btn-border-color: #b5562f;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #b5562f;
+  --bs-btn-hover-border-color: #b5562f;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #9c4826;
+  --bs-btn-active-border-color: #9c4826;
+  --bs-btn-disabled-color: #b5562f;
+  --bs-btn-disabled-border-color: #b5562f;
+  --bs-btn-focus-shadow-rgb: 181, 86, 47;
+}
+
+.btn-success {
+  --bs-btn-bg: #3f8f5b;
+  --bs-btn-border-color: #3f8f5b;
+  --bs-btn-hover-bg: #357a4d;
+  --bs-btn-hover-border-color: #357a4d;
+  --bs-btn-active-bg: #2e6a43;
+  --bs-btn-active-border-color: #2e6a43;
+  --bs-btn-disabled-bg: #3f8f5b;
+  --bs-btn-disabled-border-color: #3f8f5b;
+  --bs-btn-focus-shadow-rgb: 63, 143, 91;
+}
+
+.btn-outline-success {
+  --bs-btn-color: #3f8f5b;
+  --bs-btn-border-color: #3f8f5b;
+  --bs-btn-hover-bg: #3f8f5b;
+  --bs-btn-hover-border-color: #3f8f5b;
+  --bs-btn-active-bg: #357a4d;
+  --bs-btn-active-border-color: #357a4d;
+}
+
+.btn-outline-danger {
+  --bs-btn-color: #c0392b;
+  --bs-btn-border-color: #c0392b;
+  --bs-btn-hover-bg: #c0392b;
+  --bs-btn-hover-border-color: #c0392b;
+  --bs-btn-active-bg: #a53125;
+  --bs-btn-active-border-color: #a53125;
+}
+
+/* Campos, menus e barras */
+.form-control:focus,
+.form-select:focus {
+  border-color: #dba58d;
+  box-shadow: 0 0 0 0.25rem rgba(181, 86, 47, 0.2);
+}
+
+.form-check-input:checked {
+  background-color: #b5562f;
+  border-color: #b5562f;
+}
+
+.form-check-input:focus {
+  border-color: #dba58d;
+  box-shadow: 0 0 0 0.25rem rgba(181, 86, 47, 0.2);
+}
+
+.dropdown-menu {
+  --bs-dropdown-link-active-bg: #b5562f;
+}
+
+.list-group {
+  --bs-list-group-active-bg: #b5562f;
+  --bs-list-group-active-border-color: #b5562f;
+}
+
+.progress {
+  --bs-progress-bar-bg: #b5562f;
 }
 
 body {
@@ -25,7 +134,7 @@ body {
 
 .navbar {
   background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura)) !important;
-  box-shadow: 0 2px 12px rgba(74, 108, 247, 0.25);
+  box-shadow: 0 2px 12px rgba(181, 86, 47, 0.25);
   padding: 0.6rem 1rem;
 }
 
@@ -140,7 +249,7 @@ body {
 }
 
 .table thead th {
-  background-color: #f8f9fc;
+  background-color: #f7f0ea;
   font-weight: 600;
   font-size: 0.85rem;
   text-transform: uppercase;
@@ -159,7 +268,7 @@ body {
 .progresso-barra {
   height: 10px;
   border-radius: 5px;
-  background-color: #e9ecef;
+  background-color: #efe5dc;
 }
 
 /* Certificado */
@@ -168,7 +277,7 @@ body {
   border-radius: 15px;
   padding: 2.5rem;
   text-align: center;
-  background: linear-gradient(135deg, #f5f7ff 0%, #e8ecff 100%);
+  background: linear-gradient(135deg, #fdf8f3 0%, #f7e8dc 100%);
   max-width: 600px;
   margin: 0 auto;
 }

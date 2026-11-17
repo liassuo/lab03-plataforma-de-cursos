@@ -200,7 +200,7 @@ export function Financeiro() {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Assinatura</th>
+                <th>Origem</th>
                 <th>Valor</th>
                 <th>Método</th>
                 <th>ID Transação</th>
@@ -214,7 +214,7 @@ export function Financeiro() {
               {pagamentos.map((p) => (
                 <tr key={p.id}>
                   <td>{p.id}</td>
-                  <td>#{p.idAssinatura}</td>
+                  <td>{p.idAssinatura ? `Assinatura #${p.idAssinatura}` : `Curso: ${p.matricula?.curso?.titulo ?? '-'}`}</td>
                   <td>{formatarPreco(p.valorPago)}</td>
                   <td>{p.metodoPagamento}</td>
                   <td><code>{p.idTransacaoGateway}</code></td>

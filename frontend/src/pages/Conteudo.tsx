@@ -4,6 +4,7 @@ import { api } from '../services/api'
 import { Modal } from '../components/Modal'
 import { useToast } from '../components/Toasts'
 import type { Curso } from '../models'
+import { obterUsuarioLogado } from '../services/auth'
 
 export function Conteudo() {
   const [cursos, setCursos] = useState<Curso[]>([])
@@ -22,8 +23,10 @@ export function Conteudo() {
   const exibirToast = useToast()
 
   useEffect(() => {
+    const usuario = obterUsuarioLogado()
     api.get<Curso[]>('cursos')
-      .then(setCursos)
+      // O autor só gerencia o conteúdo dos próprios cursos
+      .then((lista) => setCursos(usuario?.tipo === 'AUTOR' ? lista.filter((c) => c.idInstrutor === usuario.id) : lista))
       .catch((erro) => exibirToast('Erro ao carregar cursos: ' + erro.message, 'danger'))
   }, [])
 
