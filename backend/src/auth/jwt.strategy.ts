@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   // Se o token for válido, o retorno é anexado em req.user
-  validate({ sub, email }: { sub: number; email: string }) {
-    return { userId: sub, email };
+  validate({ sub, email, tipo }: { sub: number; email: string; tipo: string }) {
+    return { userId: sub, email, tipo };
   }
 }

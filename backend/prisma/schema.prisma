@@ -14,6 +14,7 @@ model Usuario {
   nomeCompleto String
   email        String   @unique
   senhaHash    String
+  tipo         String   @default("ALUNO") // ALUNO, AUTOR, ADMIN
   dataCadastro DateTime @default(now())
 
   cursosMinistrados Curso[]
@@ -22,6 +23,7 @@ model Usuario {
   avaliacoes        Avaliacao[]
   certificados      Certificado[]
   assinaturas       Assinatura[]
+  notificacoes      Notificacao[]
 }
 
 model Categoria {
@@ -34,18 +36,20 @@ model Categoria {
 }
 
 model Curso {
-  id             Int      @id @default(autoincrement())
-  titulo         String
-  descricao      String?
-  idInstrutor    Int
-  idCategoria    Int
-  nivel          String // Iniciante, Intermediário, Avançado
-  dataPublicacao DateTime @default(now())
-  totalAulas     Int      @default(0)
-  totalHoras     Float    @default(0)
+  id              Int      @id @default(autoincrement())
+  titulo          String
+  descricao       String?
+  idInstrutor     Int
+  idCategoria     Int
+  nivel           String // Iniciante, Intermediário, Avançado
+  dataPublicacao  DateTime @default(now())
+  dataAtualizacao DateTime @default(now()) @updatedAt // muda sozinho a cada alteração do curso
+  totalAulas      Int      @default(0)
+  totalHoras      Float    @default(0)
+  preco           Float    @default(0)
 
-  instrutor Usuario   @relation(fields: [idInstrutor], references: [id])
-  categoria Categoria @relation(fields: [idCategoria], references: [id])
+  instrutor Usuario   @relation(fields: [idInstrutor], references: [id], onDelete: Cascade)
+  categoria Categoria @relation(fields: [idCategoria], references: [id], onDelete: Cascade)
 
   modulos      Modulo[]
   matriculas   Matricula[]
@@ -88,8 +92,9 @@ model Matricula {
   dataMatricula DateTime  @default(now())
   dataConclusao DateTime?
 
-  usuario Usuario @relation(fields: [idUsuario], references: [id])
-  curso   Curso   @relation(fields: [idCurso], references: [id], onDelete: Cascade)
+  usuario    Usuario     @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+  curso      Curso       @relation(fields: [idCurso], references: [id], onDelete: Cascade)
+  pagamentos Pagamento[]
 
   @@unique([idUsuario, idCurso])
 }
@@ -100,7 +105,7 @@ model ProgressoAula {
   dataConclusao DateTime?
   status        String    @default("Pendente") // Pendente, Concluido
 
-  usuario Usuario @relation(fields: [idUsuario], references: [id])
+  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
   aula    Aula    @relation(fields: [idAula], references: [id], onDelete: Cascade)
 
   @@id([idUsuario, idAula])
@@ -114,7 +119,7 @@ model Avaliacao {
   comentario    String?
   dataAvaliacao DateTime @default(now())
 
-  usuario Usuario @relation(fields: [idUsuario], references: [id])
+  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
   curso   Curso   @relation(fields: [idCurso], references: [id], onDelete: Cascade)
 
   @@unique([idUsuario, idCurso])
@@ -128,7 +133,7 @@ model Trilha {
   descricao   String?
   idCategoria Int
 
-  categoria    Categoria     @relation(fields: [idCategoria], references: [id])
+  categoria    Categoria     @relation(fields: [idCategoria], references: [id], onDelete: Cascade)
   cursos       TrilhaCurso[]
   certificados Certificado[]
 }
@@ -152,9 +157,21 @@ model Certificado {
   codigoVerificacao String   @unique
   dataEmissao       DateTime @default(now())
 
-  usuario Usuario @relation(fields: [idUsuario], references: [id])
+  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
   curso   Curso   @relation(fields: [idCurso], references: [id], onDelete: Cascade)
-  trilha  Trilha? @relation(fields: [idTrilha], references: [id])
+  trilha  Trilha? @relation(fields: [idTrilha], references: [id], onDelete: SetNull)
+}
+
+// ===== Notificações =====
+
+model Notificacao {
+  id          Int      @id @default(autoincrement())
+  idUsuario   Int
+  mensagem    String
+  lida        Boolean  @default(false)
+  dataCriacao DateTime @default(now())
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
 }
 
 // ===== Negócio =====
@@ -177,18 +194,21 @@ model Assinatura {
   dataFim    DateTime
   status     String   @default("Ativa")
 
-  usuario    Usuario     @relation(fields: [idUsuario], references: [id])
-  plano      Plano       @relation(fields: [idPlano], references: [id])
+  usuario    Usuario     @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+  plano      Plano       @relation(fields: [idPlano], references: [id], onDelete: Cascade)
   pagamentos Pagamento[]
 }
 
+// O pagamento é de uma assinatura (plano) ou da compra de um curso (matrícula)
 model Pagamento {
   id                 Int      @id @default(autoincrement())
-  idAssinatura       Int
+  idAssinatura       Int?
+  idMatricula        Int?
   valorPago          Float
   dataPagamento      DateTime @default(now())
   metodoPagamento    String // Cartão, Pix, Boleto
   idTransacaoGateway String
 
-  assinatura Assinatura @relation(fields: [idAssinatura], references: [id], onDelete: Cascade)
+  assinatura Assinatura? @relation(fields: [idAssinatura], references: [id], onDelete: Cascade)
+  matricula  Matricula?  @relation(fields: [idMatricula], references: [id], onDelete: Cascade)
 }

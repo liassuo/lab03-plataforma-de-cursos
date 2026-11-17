@@ -1,5 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { Roles } from '../common/roles.decorator';
+import { RolesGuard } from '../common/roles.guard';
 import { TrilhasService } from './trilhas.service';
 import { CreateTrilhaDto } from './dto/create-trilha.dto';
 import { UpdateTrilhaDto } from './dto/update-trilha.dto';
@@ -22,30 +25,45 @@ export class TrilhasController {
     return this.trilhasService.findOne(+id);
   }
 
+  @ApiBearerAuth('token')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   @Post()
   @ApiOperation({ summary: 'Criar uma nova trilha' })
   create(@Body() createTrilhaDto: CreateTrilhaDto) {
     return this.trilhasService.create(createTrilhaDto);
   }
 
+  @ApiBearerAuth('token')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar uma trilha' })
   update(@Param('id') id: string, @Body() updateTrilhaDto: UpdateTrilhaDto) {
     return this.trilhasService.update(+id, updateTrilhaDto);
   }
 
+  @ApiBearerAuth('token')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   @Delete(':id')
   @ApiOperation({ summary: 'Remover uma trilha' })
   remove(@Param('id') id: string) {
     return this.trilhasService.remove(+id);
   }
 
+  @ApiBearerAuth('token')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   @Post(':id/cursos')
   @ApiOperation({ summary: 'Adicionar um curso à trilha' })
   adicionarCurso(@Param('id') id: string, @Body() addCursoTrilhaDto: AddCursoTrilhaDto) {
     return this.trilhasService.adicionarCurso(+id, addCursoTrilhaDto);
   }
 
+  @ApiBearerAuth('token')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   @Delete(':id/cursos/:idCurso')
   @ApiOperation({ summary: 'Remover um curso da trilha' })
   removerCurso(@Param('id') id: string, @Param('idCurso') idCurso: string) {

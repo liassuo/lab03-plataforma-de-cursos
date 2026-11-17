@@ -1,5 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { Roles, UsuarioLogado } from '../common/roles.decorator';
+import { RolesGuard } from '../common/roles.guard';
 import { ModulosService } from './modulos.service';
 import { CreateModuloDto } from './dto/create-modulo.dto';
 import { UpdateModuloDto } from './dto/update-modulo.dto';
@@ -21,21 +24,34 @@ export class ModulosController {
     return this.modulosService.findOne(+id);
   }
 
+  @ApiBearerAuth('token')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('AUTOR', 'ADMIN')
   @Post()
   @ApiOperation({ summary: 'Criar um novo módulo em um curso' })
-  create(@Body() createModuloDto: CreateModuloDto) {
-    return this.modulosService.create(createModuloDto);
+  create(@Body() createModuloDto: CreateModuloDto, @Req() req: { user: UsuarioLogado }) {
+    return this.modulosService.create(createModuloDto, req.user);
   }
 
+  @ApiBearerAuth('token')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('AUTOR', 'ADMIN')
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar um módulo' })
-  update(@Param('id') id: string, @Body() updateModuloDto: UpdateModuloDto) {
-    return this.modulosService.update(+id, updateModuloDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateModuloDto: UpdateModuloDto,
+    @Req() req: { user: UsuarioLogado },
+  ) {
+    return this.modulosService.update(+id, updateModuloDto, req.user);
   }
 
+  @ApiBearerAuth('token')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('AUTOR', 'ADMIN')
   @Delete(':id')
   @ApiOperation({ summary: 'Remover um módulo (e suas aulas)' })
-  remove(@Param('id') id: string) {
-    return this.modulosService.remove(+id);
+  remove(@Param('id') id: string, @Req() req: { user: UsuarioLogado }) {
+    return this.modulosService.remove(+id, req.user);
   }
 }

@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ClientKafka } from '@nestjs/microservices';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
@@ -9,12 +10,16 @@ const usuarioSemSenha = {
   id: true,
   nomeCompleto: true,
   email: true,
+  tipo: true,
   dataCadastro: true,
 };
 
 @Injectable()
 export class UsuariosService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject('KAFKA') private kafka: ClientKafka,
+  ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto) {
     const emailExiste = await this.prisma.usuario.findUnique({
@@ -25,7 +30,7 @@ export class UsuariosService {
     // Gera o hash da senha antes de salvar no banco
     const senhaHash = await bcrypt.hash(createUsuarioDto.senha, 10);
 
-    return this.prisma.usuario.create({
+    const usuario = await this.prisma.usuario.create({
       data: {
         nomeCompleto: createUsuarioDto.nomeCompleto,
         email: createUsuarioDto.email,
@@ -33,6 +38,15 @@ export class UsuariosService {
       },
       select: usuarioSemSenha,
     });
+
+    // Publica o evento no Kafka; o consumidor cria a mensagem de boas-vindas
+    this.kafka.emit('usuario-criado', {
+      id: usuario.id,
+      nomeCompleto: usuario.nomeCompleto,
+      email: usuario.email,
+    });
+
+    return usuario;
   }
 
   findAll() {
@@ -60,6 +74,7 @@ export class UsuariosService {
       data: {
         nomeCompleto: updateUsuarioDto.nomeCompleto,
         email: updateUsuarioDto.email,
+        tipo: updateUsuarioDto.tipo,
       },
       select: usuarioSemSenha,
     });

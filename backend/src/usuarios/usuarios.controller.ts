@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { Roles } from '../common/roles.decorator';
+import { RolesGuard } from '../common/roles.guard';
 import { UsuariosService } from './usuarios.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
@@ -20,9 +22,10 @@ export class UsuariosController {
     return this.usuariosService.create(createUsuarioDto);
   }
 
-  // Rotas protegidas: exigem o token JWT no cabeçalho Authorization
+  // Rotas protegidas: exigem o token JWT; listar, editar e remover são só para ADMIN
   @ApiBearerAuth('token')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   @Get()
   @ApiOperation({ summary: 'Listar todos os usuários' })
   @ApiResponse({ status: 401, description: 'Não autenticado.' })
@@ -39,7 +42,8 @@ export class UsuariosController {
   }
 
   @ApiBearerAuth('token')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar um usuário' })
   update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
@@ -47,7 +51,8 @@ export class UsuariosController {
   }
 
   @ApiBearerAuth('token')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   @Delete(':id')
   @ApiOperation({ summary: 'Remover um usuário' })
   remove(@Param('id') id: string) {

@@ -7,6 +7,7 @@ import { LoginDto } from './dto/login.dto';
 export interface JwtPayload {
   sub: number;
   email: string;
+  tipo: string;
 }
 
 @Injectable()
@@ -26,7 +27,7 @@ export class AuthService {
     }
 
     // Payload: o conteúdo que vai dentro do token
-    const payload: JwtPayload = { sub: usuario.id, email: usuario.email };
+    const payload: JwtPayload = { sub: usuario.id, email: usuario.email, tipo: usuario.tipo };
 
     return {
       access_token: this.jwtService.sign(payload),
@@ -34,6 +35,7 @@ export class AuthService {
         id: usuario.id,
         nomeCompleto: usuario.nomeCompleto,
         email: usuario.email,
+        tipo: usuario.tipo,
       },
     };
   }

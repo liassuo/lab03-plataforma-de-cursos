@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { UsuarioLogado } from '../common/roles.decorator';
+import { recalcularTotaisCurso, verificarDonoDoCurso } from '../common/cursos.helpers';
 import { CreateModuloDto } from './dto/create-modulo.dto';
 import { UpdateModuloDto } from './dto/update-modulo.dto';
 
@@ -7,7 +9,9 @@ import { UpdateModuloDto } from './dto/update-modulo.dto';
 export class ModulosService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createModuloDto: CreateModuloDto) {
+  async create(createModuloDto: CreateModuloDto, usuario: UsuarioLogado) {
+    await verificarDonoDoCurso(this.prisma, createModuloDto.idCurso, usuario);
+
     let ordem = createModuloDto.ordem;
 
     // Se a ordem não for informada, coloca no final da fila
@@ -41,8 +45,10 @@ export class ModulosService {
     return modulo;
   }
 
-  async update(id: number, updateModuloDto: UpdateModuloDto) {
-    await this.findOne(id);
+  async update(id: number, updateModuloDto: UpdateModuloDto, usuario: UsuarioLogado) {
+    const modulo = await this.findOne(id);
+    await verificarDonoDoCurso(this.prisma, modulo.idCurso, usuario);
+
     return this.prisma.modulo.update({
       where: { id },
       data: {
@@ -52,10 +58,14 @@ export class ModulosService {
     });
   }
 
-  async remove(id: number) {
-    await this.findOne(id);
+  async remove(id: number, usuario: UsuarioLogado) {
+    const modulo = await this.findOne(id);
+    await verificarDonoDoCurso(this.prisma, modulo.idCurso, usuario);
+
     // As aulas do módulo são removidas em cascata (onDelete: Cascade no schema)
     await this.prisma.modulo.delete({ where: { id } });
+    // Sem as aulas do módulo, o total de aulas e horas do curso muda
+    await recalcularTotaisCurso(this.prisma, modulo.idCurso);
     return { mensagem: 'Módulo removido' };
   }
 }

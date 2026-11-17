@@ -29,7 +29,7 @@ export class PagamentosService {
 
   findAll() {
     return this.prisma.pagamento.findMany({
-      include: { assinatura: true },
+      include: { assinatura: true, matricula: { include: { curso: true } } },
     });
   }
 

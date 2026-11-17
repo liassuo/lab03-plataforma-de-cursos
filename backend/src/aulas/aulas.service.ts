@@ -1,13 +1,29 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ClientKafka } from '@nestjs/microservices';
 import { PrismaService } from '../prisma/prisma.service';
+import { UsuarioLogado } from '../common/roles.decorator';
+import { recalcularTotaisCurso, verificarDonoDoCurso } from '../common/cursos.helpers';
 import { CreateAulaDto } from './dto/create-aula.dto';
 import { UpdateAulaDto } from './dto/update-aula.dto';
 
 @Injectable()
 export class AulasService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject('KAFKA') private kafka: ClientKafka,
+  ) {}
 
-  async create(createAulaDto: CreateAulaDto) {
+  // Descobre de qual curso é o módulo (a aula pertence a um módulo, que pertence a um curso)
+  private async buscarModulo(idModulo: number) {
+    const modulo = await this.prisma.modulo.findUnique({ where: { id: idModulo } });
+    if (!modulo) throw new NotFoundException('Módulo não encontrado');
+    return modulo;
+  }
+
+  async create(createAulaDto: CreateAulaDto, usuario: UsuarioLogado) {
+    const modulo = await this.buscarModulo(createAulaDto.idModulo);
+    const curso = await verificarDonoDoCurso(this.prisma, modulo.idCurso, usuario);
+
     let ordem = createAulaDto.ordem;
 
     if (!ordem) {
@@ -29,7 +45,14 @@ export class AulasService {
       },
     });
 
-    await this.recalcularTotaisCurso(aula.idModulo);
+    await recalcularTotaisCurso(this.prisma, modulo.idCurso);
+
+    // Aula nova é uma atualização do curso: publica no Kafka para avisar os alunos
+    this.kafka.emit('curso-atualizado', {
+      idCurso: modulo.idCurso,
+      mensagem: `Nova aula no curso "${curso.titulo}": ${aula.titulo}`,
+    });
+
     return aula;
   }
 
@@ -43,8 +66,11 @@ export class AulasService {
     return aula;
   }
 
-  async update(id: number, updateAulaDto: UpdateAulaDto) {
-    await this.findOne(id);
+  async update(id: number, updateAulaDto: UpdateAulaDto, usuario: UsuarioLogado) {
+    const aulaAtual = await this.findOne(id);
+    const modulo = await this.buscarModulo(aulaAtual.idModulo);
+    await verificarDonoDoCurso(this.prisma, modulo.idCurso, usuario);
+
     const aula = await this.prisma.aula.update({
       where: { id },
       data: {
@@ -55,34 +81,17 @@ export class AulasService {
         ordem: updateAulaDto.ordem,
       },
     });
-    await this.recalcularTotaisCurso(aula.idModulo);
+    await recalcularTotaisCurso(this.prisma, modulo.idCurso);
     return aula;
   }
 
-  async remove(id: number) {
+  async remove(id: number, usuario: UsuarioLogado) {
     const aula = await this.findOne(id);
+    const modulo = await this.buscarModulo(aula.idModulo);
+    await verificarDonoDoCurso(this.prisma, modulo.idCurso, usuario);
+
     await this.prisma.aula.delete({ where: { id } });
-    await this.recalcularTotaisCurso(aula.idModulo);
+    await recalcularTotaisCurso(this.prisma, modulo.idCurso);
     return { mensagem: 'Aula removida' };
-  }
-
-  // Mantém os campos totalAulas e totalHoras do curso atualizados
-  private async recalcularTotaisCurso(idModulo: number) {
-    const modulo = await this.prisma.modulo.findUnique({ where: { id: idModulo } });
-    if (!modulo) return;
-
-    const aulas = await this.prisma.aula.findMany({
-      where: { modulo: { idCurso: modulo.idCurso } },
-    });
-
-    const totalMinutos = aulas.reduce((acc, a) => acc + a.duracaoMinutos, 0);
-
-    await this.prisma.curso.update({
-      where: { id: modulo.idCurso },
-      data: {
-        totalAulas: aulas.length,
-        totalHoras: Math.round((totalMinutos / 60) * 10) / 10,
-      },
-    });
   }
 }

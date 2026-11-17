@@ -3,10 +3,12 @@ import { Type } from 'class-transformer';
 import { IsInt, IsOptional } from 'class-validator';
 
 export class CreateCertificadoDto {
-  @ApiProperty({ example: 1, description: 'ID do usuário (aluno)' })
+  // Só o ADMIN informa o aluno; para os outros perfis é usado o usuário logado
+  @ApiPropertyOptional({ example: 1, description: 'ID do aluno (usado apenas pelo ADMIN)' })
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
-  idUsuario: number;
+  idUsuario?: number;
 
   @ApiProperty({ example: 1, description: 'ID do curso concluído' })
   @Type(() => Number)

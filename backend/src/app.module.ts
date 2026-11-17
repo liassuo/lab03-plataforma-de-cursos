@@ -14,6 +14,8 @@ import { CertificadosModule } from './certificados/certificados.module';
 import { PlanosModule } from './planos/planos.module';
 import { AssinaturasModule } from './assinaturas/assinaturas.module';
 import { PagamentosModule } from './pagamentos/pagamentos.module';
+import { MensageriaModule } from './mensageria/mensageria.module';
+import { NotificacoesModule } from './notificacoes/notificacoes.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { PagamentosModule } from './pagamentos/pagamentos.module';
     PlanosModule,
     AssinaturasModule,
     PagamentosModule,
+    MensageriaModule,
+    NotificacoesModule,
   ],
 })
 export class AppModule {}
